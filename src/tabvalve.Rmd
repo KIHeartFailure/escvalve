@@ -1,0 +1,17 @@
+```{r tabvalve, cache=cacheon}
+
+tabvalve <- edata %>%
+  filter(valve == "Combined VHD") %>%
+  count(num_opAorSte, num_opAorReg, num_opMitReg, num_opTriCus) %>%
+  mutate(
+    percent = fn(n / sum(n) * 100, 1),
+    'n (%)' = paste0(n, " (", percent, "%)")
+  ) %>%
+  select(-n, -percent)
+
+default_kable(tabvalve,
+  font_size = 8,
+  caption = "Combined VHD",
+  scale_down = FALSE
+)
+```

@@ -1,0 +1,102 @@
+```{r ortabfunc, cache=cacheon}
+
+predfunc <- function(impdata, val) {
+  # mult
+
+  ormod <- with(impdata, glm(formula(paste0("valve2 == '", val, "' ~ ", paste(modvars, collapse = " + "))),
+    family = binomial(link = "logit")
+  ))
+
+  sormod <- summary(pool(ormod))
+  nval <- length(sormod$term)
+
+  units <- rep(1, nval - 1)
+  units[sormod$term[2:nval] %in% c("num_age")] <- 10
+  units[sormod$term[2:nval] %in% c("num_opNt")] <- 100
+  units[sormod$term[2:nval] %in% c("num_opEf")] <- 5
+
+  preds <- bind_cols(
+    Variable = as.character(sormod$term[2:nval]),
+    logor = sormod$estimate[2:nval],
+    lci = sormod$estimate[2:nval] - global_z05 * sormod$std.error[2:nval],
+    uci = sormod$estimate[2:nval] + global_z05 * sormod$std.error[2:nval],
+    p = fn(sormod$p.value[2:nval], dig = 3, p = TRUE)
+  ) %>%
+    mutate(orci = paste0(fn(exp(logor)^units, 2), " (", fn(exp(lci)^units, 2), "-", fn(exp(uci)^units, 2), ")")) %>%
+    select(Variable, logor, lci, uci, orci, p) %>%
+    mutate(
+      Variable = str_replace(Variable, fixed("Yes"), ""),
+      Variable = paste0(Variable, " (units of ", units, ")"),
+      Variable = str_replace(Variable, fixed(" (units of 1)"), "")
+    )
+
+  # crude
+  for (i in seq_along(modvars)) {
+    ormoduni <- with(impdata, glm(formula(paste0("valve2 == '", val, "' ~ ", modvars[i])),
+      family = binomial(link = "logit")
+    ))
+
+    sormoduni <- summary(pool(ormoduni))
+
+    nval <- length(sormoduni$term)
+
+    units <- rep(1, nval - 1)
+    units[sormoduni$term[2:nval] %in% c("num_age")] <- 10
+    units[sormoduni$term[2:nval] %in% c("num_opNt")] <- 100
+    units[sormoduni$term[2:nval] %in% c("num_opEf")] <- 5
+
+    predsunitmp <- bind_cols(
+      Variable = as.character(sormoduni$term[2:nval]),
+      logor = sormoduni$estimate[2:nval],
+      lci = sormoduni$estimate[2:nval] - global_z05 * sormoduni$std.error[2:nval],
+      uci = sormoduni$estimate[2:nval] + global_z05 * sormoduni$std.error[2:nval],
+      p = fn(sormoduni$p.value[2:nval], dig = 3, p = TRUE)
+    ) %>%
+      mutate(orci = paste0(fn(exp(logor)^units, 2), " (", fn(exp(lci)^units, 2), "-", fn(exp(uci)^units, 2), ")")) %>%
+      select(Variable, logor, lci, uci, orci, p) %>%
+      mutate(
+        Variable = str_replace(Variable, fixed("Yes"), ""),
+        Variable = paste0(Variable, " (units of ", units, ")"),
+        Variable = str_replace(Variable, fixed(" (units of 1)"), "")
+      )
+
+    if (i == 1) {
+      predsuni <<- predsunitmp
+    } else {
+      predsuni <<- bind_rows(predsuni, predsunitmp)
+    }
+  }
+
+  predall <- full_join(predsuni, preds, by = "Variable")
+
+  predallprint <- predall %>%
+    select(Variable, orci.x, p.x, orci.y, p.y)
+
+  return(predallprint)
+}
+```
+
+```{r ortab, dependson="ortabfunc", cache=cacheon}
+
+impdatacomb <- miceadds::subset_datlist(imp, expr_subset = edata$valve2 != "Single VHD")
+impdatasingle <- miceadds::subset_datlist(imp, expr_subset = edata$valve2 != "Combined VHD")
+
+predalls <- predfunc(impdata = impdatasingle, val = "Single VHD")
+predallc <- predfunc(impdata = impdatacomb, val = "Combined VHD")
+
+predall <- bind_cols(predalls, predallc[2:5])
+colnames(predall) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 4))
+
+write.xlsx(predall, paste0(
+  "./output/tabs/Associations between valve disease and characteristics_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+default_kable(predall,
+  font_size = 6,
+  caption = "Associations between valve disease and characteristics",
+  escape = T
+) %>%
+  add_header_above(c(" " = 1, "Crude" = 2, "Adjusted" = 2, "Crude" = 2, "Adjusted" = 2)) %>%
+  add_header_above(c(" " = 1, "Single VHD vs No VHD" = 4, "Combined VHD vs No VHD" = 4))
+```

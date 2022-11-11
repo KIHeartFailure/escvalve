@@ -1,0 +1,244 @@
+```{r km, cache=cacheon}
+
+kmfunc3 <- function(time, event, eventname, ymax = 1) {
+  fits <- survfit(formula(paste0("Surv(", time, ",", event, "== 1) ~ valve2")),
+    data = edata %>% filter(survpop)
+  )
+
+  # cox model
+  amod <- with(impsurv, coxph(formula(paste0(
+    "Surv(", time, ",", event, " == 1) ~ relevel(valve2, ref = 'No VHD') + ",
+    paste(modvars, collapse = " + ")
+  ))))
+
+  ## df the number of events minus the regression coefficients.
+  ## There is support for this from middle of page 149 of the book by Parmer & Machin (ISBN 0471936405)
+  asmod <- summary(pool(amod,
+    dfcom =
+      (amod$analyses[[1]]$nevent - length(amod$analyses[[1]]$coefficients))
+  ))
+
+  hrprint <- paste0(
+    fn(exp(asmod$estimate[1:2]), dig = 2),
+    " (", fn(exp(asmod$estimate[1:2] - global_z05 * asmod$std.error[1:2]), dig = 2),
+    "-", fn(exp(asmod$estimate[1:2] + global_z05 * asmod$std.error[1:2]), dig = 2), "), ",
+    fn(asmod$p.value[1:2], dig = 3, p = TRUE)
+  )
+
+  # c(bottom, left, top, right)
+  cexmy <- 1.2
+  par(mar = c(7.5, 8.5, 1, 1) + 0.1)
+
+  plots <- plot(fits,
+    fun = "event",
+    ylab = paste0(eventname, " (%)"),
+    yscale = 100,
+    xscale = 30.5,
+    col = global_cols[c(3, 5, 7)],
+    mark.time = FALSE,
+    bty = "n",
+    xlim = c(0, 12 * 30),
+    ylim = c(0, ymax + 0.05),
+    xlab = "Follow-up (months)",
+    cex.lab = cexmy,
+    axes = F,
+    lwd = 4,
+    lty = 1,
+    xaxs = "i", yaxs = "i"
+  )
+
+  axis(2, seq(0, ymax + 0.05, 0.05), c(seq(0, ymax * 100, 5), 100), las = 2, cex.axis = cexmy)
+  axis(1, at = seq(0, 12, 2) * 30, seq(0, 12, 2), cex.axis = cexmy)
+  plotrix::axis.break(2, ymax + 0.025, style = "slash")
+
+  levs <- levels(edata %>% pull(valve2))
+
+  legend(x = 5.7 * 30, y = ymax + 0.05, c("Adjusted HR (95% CI), p-value", "ref", hrprint), cex = cexmy, adj = 0.5, bty = "n")
+  legend(
+    x = 0.5, y = ymax + 0.05, bty = "n", c("", levs), lty = 1,
+    col = c("white", global_cols[c(3, 5, 7)]), cex = cexmy, lwd = 4,
+    text.col = c("white", global_cols[c(3, 5, 7)])
+  )
+
+  mtext("No. at risk", side = 1, line = 3.7, at = -100, adj = 0, cex = cexmy, font = 2)
+  mtext(levs[1], side = 1, line = 4.7, at = -100, adj = 0, cex = cexmy, col = global_cols[3])
+  mtext(levs[2], side = 1, line = 5.7, at = -100, adj = 0, cex = cexmy, col = global_cols[5])
+  mtext(levs[3], side = 1, line = 6.7, at = -100, adj = 0, cex = cexmy, col = global_cols[7])
+
+  nrisk <- summary(fits, seq(0, 12, 2) * 30, extend = T)
+
+  axis(1, at = seq(0, 12, 2) * 30, labels = nrisk$n.risk[nrisk$strata == paste0("valve2=", levs[1])], line = 3.7, tick = FALSE, cex.axis = cexmy)
+  axis(1, at = seq(0, 12, 2) * 30, labels = nrisk$n.risk[nrisk$strata == paste0("valve2=", levs[2])], line = 4.7, tick = FALSE, cex.axis = cexmy)
+  axis(1, at = seq(0, 12, 2) * 30, labels = nrisk$n.risk[nrisk$strata == paste0("valve2=", levs[3])], line = 5.7, tick = FALSE, cex.axis = cexmy)
+}
+
+
+kmfunc6 <- function(time, event, eventname, ymax = 1) {
+  fits <- survfit(formula(paste0("Surv(", time, ",", event, "== 1) ~ valve")),
+    data = edata %>% filter(survpop)
+  )
+
+  # c(bottom, left, top, right)
+  cexmy <- 1.2
+  par(mar = c(7.5, 8.5, 1, 1) + 0.1)
+
+  plots <- plot(fits,
+    fun = "event",
+    ylab = paste0(eventname, " (%)"),
+    yscale = 100,
+    xscale = 30.5,
+    col = global_cols[c(2, 3, 4, 5, 6, 7)],
+    mark.time = FALSE,
+    bty = "n",
+    xlim = c(0, 12 * 30),
+    ylim = c(0, ymax + 0.05),
+    xlab = "Follow-up (months)",
+    cex.lab = cexmy,
+    axes = F,
+    lwd = 4,
+    lty = 1,
+    xaxs = "i", yaxs = "i"
+  )
+
+  axis(2, seq(0, ymax + 0.05, 0.05), c(seq(0, ymax * 100, 5), 100), las = 2, cex.axis = cexmy)
+  axis(1, at = seq(0, 12, 2) * 30, seq(0, 12, 2), cex.axis = cexmy)
+  plotrix::axis.break(2, ymax + 0.025, style = "slash")
+
+  levs <- levels(edata %>% pull(valve))
+
+  legend(
+    x = 0.5, y = ymax + 0.05, bty = "n", c("", levs), lty = 1,
+    col = c("white", global_cols[c(2, 3, 4, 5, 6, 7)]), cex = cexmy, lwd = 4,
+    text.col = c("white", global_cols[c(2, 3, 4, 5, 6, 7)])
+  )
+}
+```
+
+```{r kmdeathcvhfh, fig.cap="CV mortality/First HF hospitalization", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc3(
+  time = "outtime_hosphf",
+  event = "out_deathcvhosphf",
+  eventname = "CV mortality/First HFH",
+  ymax = 0.4
+)
+```
+
+```{r kmdeathhfh, fig.cap="All-cause mortality/First HF hospitalization", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc3(
+  time = "outtime_hosphf",
+  event = "out_deathhosphf",
+  eventname = "All-cause mortality/First HFH",
+  ymax = 0.4
+)
+```
+
+```{r kmdeathcv, fig.cap="CV mortality", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc3(
+  time = "outtime_death",
+  event = "out_deathcv",
+  eventname = "CV mortality",
+  ymax = 0.2
+)
+```
+
+```{r kmdeathnoncv, fig.cap="Non-CV mortality", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc3(
+  time = "outtime_death",
+  event = "out_deathnoncv",
+  eventname = "Non-CV mortality",
+  ymax = 0.2
+)
+```
+
+```{r kmdeath, fig.cap="All-cause mortality", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc3(
+  time = "outtime_death",
+  event = "out_death",
+  eventname = "All-cause mortality",
+  ymax = 0.2
+)
+```
+
+```{r kmhfh, fig.cap="First HF hospitalization", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc3(
+  time = "outtime_hosphf",
+  event = "out_hosphf",
+  eventname = "First HFH",
+  ymax = 0.4
+)
+```
+
+```{r kmh, fig.cap="First all-cause hospitalization", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc3(
+  time = "outtime_hosp",
+  event = "out_hosp",
+  eventname = "First all-cause hospitalization",
+  ymax = 0.4
+)
+```
+
+
+
+
+```{r kmdeathcvhfh6, fig.cap="CV mortality/First HF hospitalization - 6 groups", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc6(
+  time = "outtime_hosphf",
+  event = "out_deathcvhosphf",
+  eventname = "CV mortality/First HFH",
+  ymax = 0.4
+)
+```
+
+```{r kmdeathhfh6, fig.cap="All-cause mortality/First HF hospitalization - 6 groups", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc6(
+  time = "outtime_hosphf",
+  event = "out_deathhosphf",
+  eventname = "All-cause mortality/First HFH",
+  ymax = 0.4
+)
+```
+
+```{r kmdeathcv6, fig.cap="CV mortality - 6 groups", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc6(
+  time = "outtime_death",
+  event = "out_deathcv",
+  eventname = "CV mortality",
+  ymax = 0.2
+)
+```
+
+```{r kmdeathnoncv6, fig.cap="Non-CV mortality - 6 groups", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc6(
+  time = "outtime_death",
+  event = "out_deathnoncv",
+  eventname = "Non-CV mortality",
+  ymax = 0.2
+)
+```
+
+```{r kmdeath6, fig.cap="All-cause mortality - 6 groups", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc6(
+  time = "outtime_death",
+  event = "out_death",
+  eventname = "All-cause mortality",
+  ymax = 0.2
+)
+```
+
+```{r kmhfh6, fig.cap="First HF hospitalization - 6 groups", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc6(
+  time = "outtime_hosphf",
+  event = "out_hosphf",
+  eventname = "First HFH",
+  ymax = 0.4
+)
+```
+
+```{r kmh6, fig.cap="First all-cause hospitalization - 6 groups", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+kmfunc6(
+  time = "outtime_hosp",
+  event = "out_hosp",
+  eventname = "First all-cause hospitalization",
+  ymax = 0.4
+)
+```
