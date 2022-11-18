@@ -17,6 +17,10 @@ edata <- edata %>%
 flow <- rbind(flow, c("Non-missing values for 4 valve variables", nrow(edata)))
 
 edata <- edata %>%
+  filter(num_opAorSte == "No" & num_opAorReg == "No")
+flow <- rbind(flow, c("Exclude patients with aortic stenosis and regurgitation", nrow(edata)))
+
+edata <- edata %>%
   mutate(
     enddtm = coalesce(num_f1DeathDt, num_f1contDt),
     startdtm = num_dmVisitdt,

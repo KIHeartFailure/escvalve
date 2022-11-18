@@ -3,7 +3,7 @@
 # Impute missing values ---------------------------------------------------
 
 edataforimp <- edata %>%
-  select(patientid, valve, valve2, !!!syms(modvars), starts_with("out"))
+  select(patientid, valve, num_opMitReg, num_opTriCus, !!!syms(modvars), starts_with("out"))
 
 noimpvars <- names(edataforimp)[!names(edataforimp) %in% c(modvars)]
 

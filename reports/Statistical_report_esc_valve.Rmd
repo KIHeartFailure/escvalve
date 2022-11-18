@@ -77,7 +77,11 @@ The median age (IQR) is `r edata %>% summarise(med = fn(median(num_age, na.rm = 
   mutate(perc = fn(n / sum(n) * 100, 1)) %>%
   filter(num_dmgender == "Female") %>%
   pull(perc)`% females.    
-  
+
+## Created variables
+
+EF is from Echo-Doppler, and if this information is missing, Last known EF. 
+
 # Statistical analysis 
 
 ## General
@@ -103,13 +107,6 @@ The primary outcome, all-cause death or first re-hospitalization for HF at follo
 ```{r, child = "./src/tab1.Rmd"}
 ```
 
-
-```{r, child = "./src/tabvalve.Rmd"}
-```
-
-There are 2 EF variables (Last know and according to Echo-Doppler). 
-More missing for the latter. Could use Echo-Doppler and if missing use last known throughout (also in models)?
-
 ```{r, child = "./src/baref.Rmd"}
 ```
 
@@ -118,9 +115,22 @@ More missing for the latter. Could use Echo-Doppler and if missing use last know
 ## Associations between valve disease and characteristics
 
 Performed using logistic regression (one for combined VHD vs No VHD and one for Single VDH vs No VHD). 
-If you prefer in a Forestplot I can remove table and present only the adjusted OR in a forestplot. 
+
+TO DO: Forestplots? One presenting crud, one adjusted. I still think ok with ALL variables in Foresplot. 
 
 ```{r, child = "./src/ortab.Rmd"}
+
+```
+
+\clearpage
+
+Further, crude logistic regressions are performed for MR and TR vs No VHD respectively 
+but where the other valve is included in (so patients with MR can have TR and vice versa) 
+for important valve variables. No adjustment is performed. Imputation is not performed. 
+
+TO DO: Forestplots? Vad är murmur??? Vilken variabel?
+
+```{r, child = "./src/ortab_valvevars.Rmd"}
 
 ```
 

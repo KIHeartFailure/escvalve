@@ -1,0 +1,52 @@
+```{r ortabvalvefunc, cache=cacheon}
+
+predvalvefunc <- function(yvar, valvevars) {
+  out <- data.frame(matrix(NA, ncol = 6, nrow = length(valvevars)))
+
+  colnames(out) <- c("Variable", "logor", "lci", "uci", "p", "orci")
+
+  # crude
+  for (i in seq_along(valvevars)) {
+    ormod <- glm(formula(paste0(yvar, " == 'Yes' ~ ", valvevars[i])),
+      family = binomial(link = "logit"), data = edata
+    )
+
+    sormod <- summary(ormod)
+
+    out[i, 1] <- rownames(sormod$coefficients)[2]
+    out[i, 2] <- sormod$coefficients[2, "Estimate"]
+    out[i, 3] <- sormod$coefficients[2, "Estimate"] - global_z05 * sormod$coefficients[2, "Std. Error"]
+    out[i, 4] <- sormod$coefficients[2, "Estimate"] + global_z05 * sormod$coefficients[2, "Std. Error"]
+    out[i, 5] <- fn(sormod$coefficients[2, "Pr(>|z|)"], dig = 3, p = TRUE)
+    out[i, 6] <- paste0(
+      fn(exp(out[i, 2]), 2), " (",
+      fn(exp(out[i, 3]), 2), "-", fn(exp(out[i, 3]), 2), ")"
+    )
+  }
+
+  outprint <- out %>% select(Variable, orci, p)
+  return(outprint)
+}
+```
+
+```{r ortabvalve, dependson="ortabvalvefunc", cache=cacheon}
+
+mr <- predvalvefunc(yvar = "num_opMitReg", valvevars = c("num_dmValve", "num_opTriCus", "num_dmEtio_cat2"))
+tr <- predvalvefunc(yvar = "num_opTriCus", valvevars = c("num_dmValve", "num_opMitReg", "num_dmEtio_cat2"))
+
+outall <- full_join(mr, tr, by = "Variable")
+
+colnames(outall) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 2))
+
+write.xlsx(outall, paste0(
+  "./output/tabs/Associations between valve disease and valve variables_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+default_kable(outall,
+  font_size = 6,
+  caption = "Associations between valve disease and valve variables",
+  escape = T
+) %>%
+  add_header_above(c(" " = 1, "MR vs No VHD" = 2, "TR vs No VHD" = 2))
+```

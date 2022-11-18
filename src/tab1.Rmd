@@ -83,12 +83,10 @@ tab1func <- function(stratavar, tabname, data = edata) {
 }
 ```
 
-\blandscape
-
 ```{r tab1, cache=cacheon, dependson = "tab1func"}
 tab1func(
   stratavar = "valve",
-  tabname = "Baseline characteristics Valve disease 6 groups - All"
+  tabname = "Baseline characteristics Valve disease - All"
 )
 ```
 
@@ -97,28 +95,7 @@ tab1func(
 ```{r tab1surv, cache=cacheon, dependson = "tab1func"}
 tab1func(
   stratavar = "valve",
-  tabname = "Baseline characteristics Valve disease 6 groups - Long-term outcome population",
-  data = edata %>% filter(survpop)
-)
-```
-
-\elandscape
-
-\clearpage
-
-```{r tab12, cache=cacheon, dependson = "tab1func"}
-tab1func(
-  stratavar = "valve2",
-  tabname = "Baseline characteristics Valve disease 3 groups - All"
-)
-```
-
-\clearpage
-
-```{r tab12surv, cache=cacheon, dependson = "tab1func"}
-tab1func(
-  stratavar = "valve2",
-  tabname = "Baseline characteristics Valve disease 3 groups - Long-term outcome population",
+  tabname = "Baseline characteristics Valve disease - Long-term outcome population",
   data = edata %>% filter(survpop)
 )
 ```

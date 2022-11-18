@@ -3,7 +3,7 @@
 predfunc <- function(impdata, val) {
   # mult
 
-  ormod <- with(impdata, glm(formula(paste0("valve2 == '", val, "' ~ ", paste(modvars, collapse = " + "))),
+  ormod <- with(impdata, glm(formula(paste0("valve == '", val, "' ~ ", paste(modvars, collapse = " + "))),
     family = binomial(link = "logit")
   ))
 
@@ -11,9 +11,12 @@ predfunc <- function(impdata, val) {
   nval <- length(sormod$term)
 
   units <- rep(1, nval - 1)
-  units[sormod$term[2:nval] %in% c("num_age")] <- 10
+  units[sormod$term[2:nval] %in% c(
+    "num_age", "d_opCKDEPI_cat", "num_dmBpm",
+    "num_dmBp1", "num_opSod", "num_opLvdd"
+  )] <- 10
   units[sormod$term[2:nval] %in% c("num_opNt")] <- 100
-  units[sormod$term[2:nval] %in% c("num_opEf")] <- 5
+  units[sormod$term[2:nval] %in% c("num_opEf", "num_dmBmi")] <- 5
 
   preds <- bind_cols(
     Variable = as.character(sormod$term[2:nval]),
@@ -32,7 +35,7 @@ predfunc <- function(impdata, val) {
 
   # crude
   for (i in seq_along(modvars)) {
-    ormoduni <- with(impdata, glm(formula(paste0("valve2 == '", val, "' ~ ", modvars[i])),
+    ormoduni <- with(impdata, glm(formula(paste0("valve == '", val, "' ~ ", modvars[i])),
       family = binomial(link = "logit")
     ))
 
@@ -41,9 +44,12 @@ predfunc <- function(impdata, val) {
     nval <- length(sormoduni$term)
 
     units <- rep(1, nval - 1)
-    units[sormoduni$term[2:nval] %in% c("num_age")] <- 10
+    units[sormoduni$term[2:nval] %in% c(
+      "num_age", "d_opCKDEPI_cat", "num_dmBpm",
+      "num_dmBp1", "num_opSod", "num_opLvdd"
+    )] <- 10
     units[sormoduni$term[2:nval] %in% c("num_opNt")] <- 100
-    units[sormoduni$term[2:nval] %in% c("num_opEf")] <- 5
+    units[sormoduni$term[2:nval] %in% c("num_opEf", "num_dmBmi")] <- 5
 
     predsunitmp <- bind_cols(
       Variable = as.character(sormoduni$term[2:nval]),
@@ -78,14 +84,16 @@ predfunc <- function(impdata, val) {
 
 ```{r ortab, dependson="ortabfunc", cache=cacheon}
 
-impdatacomb <- miceadds::subset_datlist(imp, expr_subset = edata$valve2 != "Single VHD")
-impdatasingle <- miceadds::subset_datlist(imp, expr_subset = edata$valve2 != "Combined VHD")
+impdatamr <- miceadds::subset_datlist(imp, expr_subset = edata$valve %in% c("MR", "No VHD"))
+impdatatr <- miceadds::subset_datlist(imp, expr_subset = edata$valve %in% c("TR", "No VHD"))
+impdatacomb <- miceadds::subset_datlist(imp, expr_subset = edata$valve %in% c("MR+TR", "No VHD"))
 
-predalls <- predfunc(impdata = impdatasingle, val = "Single VHD")
-predallc <- predfunc(impdata = impdatacomb, val = "Combined VHD")
+predallmr <- predfunc(impdata = impdatamr, val = "MR")
+predalltr <- predfunc(impdata = impdatatr, val = "TR")
+predallcomb <- predfunc(impdata = impdatacomb, val = "MR+TR")
 
-predall <- bind_cols(predalls, predallc[2:5])
-colnames(predall) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 4))
+predall <- bind_cols(predallmr, predalltr[2:5], predallcomb[2:5])
+colnames(predall) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 6))
 
 write.xlsx(predall, paste0(
   "./output/tabs/Associations between valve disease and characteristics_", Sys.Date(), ".xlsx"
@@ -97,6 +105,9 @@ default_kable(predall,
   caption = "Associations between valve disease and characteristics",
   escape = T
 ) %>%
-  add_header_above(c(" " = 1, "Crude" = 2, "Adjusted" = 2, "Crude" = 2, "Adjusted" = 2)) %>%
-  add_header_above(c(" " = 1, "Single VHD vs No VHD" = 4, "Combined VHD vs No VHD" = 4))
+  add_header_above(c(
+    " " = 1, "Crude" = 2, "Adjusted" = 2, "Crude" = 2, "Adjusted" = 2,
+    "Crude" = 2, "Adjusted" = 2
+  )) %>%
+  add_header_above(c(" " = 1, "MR vs No VHD" = 4, "TR vs No VHD" = 4, "MR+TR vs No VHD" = 4))
 ```

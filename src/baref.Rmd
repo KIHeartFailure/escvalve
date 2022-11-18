@@ -1,8 +1,8 @@
 ```{r baref, cache=cacheon, fig.cap="Valve disease by EF", cache=cacheon, fig.width=9, fig.height=6}
 
 outdata <- edata %>%
-  filter(!is.na(num_dmEfl_cat)) %>%
-  group_by(num_dmEfl_cat) %>%
+  filter(!is.na(d_Efcomb_cat)) %>%
+  group_by(d_Efcomb_cat) %>%
   count(valve, .drop = F) %>%
   mutate(
     per = n / sum(n) * 100,
@@ -15,18 +15,18 @@ cexmy <- 1
 # c(bottom, left, top, right)
 par(mar = c(2, 4, .5, 0) + 0.1)
 
-b <- barplot(per ~ valve + num_dmEfl_cat,
+b <- barplot(per ~ valve + d_Efcomb_cat,
   data = outdata,
   beside = T,
-  col = rep(global_cols[c(2, 3, 4, 5, 6, 7)], 3),
-  border = rep(global_cols[c(2, 3, 4, 5, 6, 7)], 3),
+  col = rep(global_cols[c(2, 4, 6, 8)], 3),
+  border = rep(global_cols[c(2, 4, 6, 8)], 3),
   xlab = "EF (%)",
   ylab = "Percent",
   axes = FALSE,
   cex.lab = cexmy,
   cex.names = cexmy,
   ylim = c(0, 100),
-  names.arg = rep("", nlevels(outdata$num_dmEfl_cat))
+  names.arg = rep("", nlevels(outdata$d_Efcomb_cat))
 )
 
 axis(2, cex.axis = cexmy, las = 2)
@@ -38,17 +38,17 @@ axis(1,
 )
 
 text(
-  x = c(b), y = outdata %>% arrange(num_dmEfl_cat, valve) %>% pull(per),
+  x = c(b), y = outdata %>% arrange(d_Efcomb_cat, valve) %>% pull(per),
   pos = 3,
-  label = outdata %>% arrange(num_dmEfl_cat, valve) %>% pull(perprint),
+  label = outdata %>% arrange(d_Efcomb_cat, valve) %>% pull(perprint),
   cex = cexmy
 )
 
 legend("topleft",
   levels(outdata$valve),
-  col = global_cols[c(2, 3, 4, 5, 6, 7)],
-  fill = global_cols[c(2, 3, 4, 5, 6, 7)],
-  border = global_cols[c(2, 3, 4, 5, 6, 7)],
+  col = global_cols[c(2, 4, 6, 8)],
+  fill = global_cols[c(2, 4, 6, 8)],
+  border = global_cols[c(2, 4, 6, 8)],
   bty = "n",
   cex = cexmy
 )
