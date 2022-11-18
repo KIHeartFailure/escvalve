@@ -1,6 +1,24 @@
 ```{r tab1func, cache=cacheon}
 
 tab1func <- function(stratavar, tabname, data = edata) {
+  taboverall <- print(
+    CreateTableOne(
+      vars = tabvars,
+      data = data
+    ),
+    smd = FALSE,
+    missing = TRUE,
+    printToggle = FALSE,
+    nonnormal = tabvars,
+    test = FALSE,
+    catDigits = 1,
+    contDigits = 1,
+    explain = FALSE,
+    noSpaces = TRUE
+  )
+  taboverall <- as_tibble(cbind(var = rownames(taboverall), taboverall)) %>%
+    select(var, Missing, Overall)
+
   tab <- print(
     CreateTableOne(
       vars = tabvars,
@@ -8,7 +26,7 @@ tab1func <- function(stratavar, tabname, data = edata) {
       strata = stratavar
     ),
     smd = FALSE,
-    missing = TRUE,
+    missing = FALSE,
     printToggle = FALSE,
     nonnormal = tabvars,
     test = TRUE,
@@ -19,7 +37,12 @@ tab1func <- function(stratavar, tabname, data = edata) {
   )
   tab <- as_tibble(cbind(var = rownames(tab), tab)) %>%
     select(-test) %>%
-    select(var, Missing, everything())
+    select(var, everything())
+
+  tab <- full_join(taboverall,
+    tab,
+    by = "var"
+  )
 
   tab <- tab %>%
     # to get labs in place
@@ -62,7 +85,7 @@ tab1func <- function(stratavar, tabname, data = edata) {
     select(Variable, Missing:p)
 
   colnames(tab) <- sanitize_text(c(
-    "Variable", "Missing (%)", levels(edata %>% pull(!!sym(stratavar))), "p-value"
+    "Variable", "Missing (%)", "Overall", levels(edata %>% pull(!!sym(stratavar))), "p-value"
   ))
 
   footnote(

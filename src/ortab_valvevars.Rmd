@@ -31,8 +31,8 @@ predvalvefunc <- function(yvar, valvevars) {
 
 ```{r ortabvalve, dependson="ortabvalvefunc", cache=cacheon}
 
-mr <- predvalvefunc(yvar = "num_opMitReg", valvevars = c("num_dmValve", "num_opTriCus", "num_dmEtio_cat2"))
-tr <- predvalvefunc(yvar = "num_opTriCus", valvevars = c("num_dmValve", "num_opMitReg", "num_dmEtio_cat2"))
+mr <- predvalvefunc(yvar = "num_opMitReg", valvevars = c("num_dmValve", "num_dmEtio_cat2", "num_opMr", "num_opTriCus"))
+tr <- predvalvefunc(yvar = "num_opTriCus", valvevars = c("num_dmValve", "num_dmEtio_cat2", "num_opMr", "num_opMitReg"))
 
 outall <- full_join(mr, tr, by = "Variable")
 

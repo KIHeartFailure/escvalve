@@ -102,10 +102,14 @@ imputation using mice [@mice] for 10 datasets and 10 iterations.
 Variables included in the imputation model are indicated in Table \ref{tab:tab1}. 
 The primary outcome, all-cause death or first re-hospitalization for HF at follow-up, was included as the Nelson-Aalen estimator. Valve disease was not included in the model or imputed. 
 
+\blandscape
+
 ## Baseline characteristics
 
 ```{r, child = "./src/tab1.Rmd"}
 ```
+
+\elandscape
 
 ```{r, child = "./src/baref.Rmd"}
 ```
@@ -116,7 +120,7 @@ The primary outcome, all-cause death or first re-hospitalization for HF at follo
 
 Performed using logistic regression (one for combined VHD vs No VHD and one for Single VDH vs No VHD). 
 
-TO DO: Forestplots? One presenting crud, one adjusted. I still think ok with ALL variables in Foresplot. 
+TO DO: Forestplots? One presenting crud, one adjusted. All variables or selected?
 
 ```{r, child = "./src/ortab.Rmd"}
 
@@ -125,10 +129,10 @@ TO DO: Forestplots? One presenting crud, one adjusted. I still think ok with ALL
 \clearpage
 
 Further, crude logistic regressions are performed for MR and TR vs No VHD respectively 
-but where the other valve is included in (so patients with MR can have TR and vice versa) 
+but where the other valve is included (so patients with MR can have TR and vice versa) 
 for important valve variables. No adjustment is performed. Imputation is not performed. 
 
-TO DO: Forestplots? Vad är murmur??? Vilken variabel?
+TO DO: Forestplots? 
 
 ```{r, child = "./src/ortab_valvevars.Rmd"}
 
