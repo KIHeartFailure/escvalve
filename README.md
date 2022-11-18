@@ -1,4 +1,4 @@
-# R code for the project Characteristics and outcomes of patients with chronic heart failure with or without valvular heart disease
+# R code for the project Prevalence of, associations with, and outcomes in moderate-severe valve disease in chronic HF
 
 The aim of this R code is to be transparent and document the data handling 
 and statistical analyses performed for the project.
