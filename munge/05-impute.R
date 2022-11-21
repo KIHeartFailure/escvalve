@@ -28,10 +28,10 @@ meth[noimpvars] <- ""
 cores_2_use <- detectCores() - 1
 if (cores_2_use >= 10) {
   cores_2_use <- 10
-  m_2_use <- 1
+  m_2_use <- 2
 } else if (cores_2_use >= 5) {
   cores_2_use <- 5
-  m_2_use <- 2
+  m_2_use <- 4
 } else {
   stop("Need >= 5 cores for this computation")
 }
@@ -48,7 +48,7 @@ imp <-
     .packages = "mice"
   ) %dopar% {
     mice(edataforimp,
-      m = m_2_use, maxit = 10, method = meth,
+      m = m_2_use, maxit = 20, method = meth,
       predictorMatrix = pred,
       printFlag = FALSE
     )

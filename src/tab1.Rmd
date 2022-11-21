@@ -39,10 +39,7 @@ tab1func <- function(stratavar, tabname, data = edata) {
     select(-test) %>%
     select(var, everything())
 
-  tab <- full_join(taboverall,
-    tab,
-    by = "var"
-  )
+  tab <- cbind(taboverall, tab %>% select(-var))
 
   tab <- tab %>%
     # to get labs in place

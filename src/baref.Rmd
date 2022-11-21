@@ -18,8 +18,8 @@ par(mar = c(2, 4, .5, 0) + 0.1)
 b <- barplot(per ~ valve + d_Efcomb_cat,
   data = outdata,
   beside = T,
-  col = rep(global_cols[c(2, 4, 6, 8)], 3),
-  border = rep(global_cols[c(2, 4, 6, 8)], 3),
+  col = rep(global_cols[c(8, 6, 4, 2)], 3),
+  border = rep(global_cols[c(8, 6, 4, 2)], 3),
   xlab = "EF (%)",
   ylab = "Percent",
   axes = FALSE,
@@ -32,7 +32,7 @@ b <- barplot(per ~ valve + d_Efcomb_cat,
 axis(2, cex.axis = cexmy, las = 2)
 
 axis(1,
-  at = c(b[3, ] + 0.5), c("HFrEF", "HFmrEF", "HFpEF"),
+  at = c(b[2, ] + 0.5), c("HFrEF", "HFmrEF", "HFpEF"),
   tick = F, line = 0,
   cex.axis = cexmy
 )
@@ -46,9 +46,9 @@ text(
 
 legend("topleft",
   levels(outdata$valve),
-  col = global_cols[c(2, 4, 6, 8)],
-  fill = global_cols[c(2, 4, 6, 8)],
-  border = global_cols[c(2, 4, 6, 8)],
+  col = global_cols[c(8, 6, 4, 2)],
+  fill = global_cols[c(8, 6, 4, 2)],
+  border = global_cols[c(8, 6, 4, 2)],
   bty = "n",
   cex = cexmy
 )

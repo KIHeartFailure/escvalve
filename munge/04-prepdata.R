@@ -80,6 +80,7 @@ edata <- edata %>%
         "Other", "Valve disease"
       )
     ),
+    num_dmEtio_c1 = relevel(num_dmEtio_c1, ref = "Non-ischemic heart disease"),
     num_opNyha_cat = factor(case_when(
       is.na(num_opNyha) ~ NA_real_,
       num_opNyha %in% c("NYHA I", "NYHA II") ~ 1,

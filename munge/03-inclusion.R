@@ -2,7 +2,7 @@
 
 # Primary criteria --------------------------------------------------------
 
-flow <- c(paste0("Number of patients in ESC "), nrow(esc))
+flow <- c(paste0("Patients in ESC registry"), nrow(esc))
 
 edata <- esc %>%
   filter(num_dmPtype == "Outpatient")
@@ -18,7 +18,7 @@ flow <- rbind(flow, c("Non-missing values for 4 valve variables", nrow(edata)))
 
 edata <- edata %>%
   filter(num_opAorSte == "No" & num_opAorReg == "No")
-flow <- rbind(flow, c("Exclude patients with aortic stenosis and regurgitation", nrow(edata)))
+flow <- rbind(flow, c("Patients without aortic stenosis and regurgitation (all population)", nrow(edata)))
 
 edata <- edata %>%
   mutate(
@@ -28,7 +28,7 @@ edata <- edata %>%
     survpop = num_f1lost == "No" & outtime_death >= 0 & !is.na(outtime_death)
   )
 flow <- rbind(flow, c(
-  ". Not lost to follow-up (long-term outcome population)",
+  "Not lost to follow-up (long-term outcome population)",
   nrow(edata %>% filter(survpop))
 ))
 

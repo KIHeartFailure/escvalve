@@ -62,8 +62,7 @@ hf3_lt_fu_data_soladis_jan19.sas7bdat (from the folder DATABASE_ANALYZED.ZIP).
 
 ## Inclusion/exclusion criteria
 
-```{r flow}
-default_kable(flow, caption = "Flowchart", scale_down = F)
+```{r, child = "./src/flowchart.Rmd"}
 ```
 
 First patient in: `r min(edata$num_dmVisitdt)` and last patient in: `r max(edata$num_dmVisitdt)`. 
@@ -98,7 +97,7 @@ follow-up. Further, times to hospitalisation that were larger than time
 to death or last follow-up were set to death or last follow-up. 
 
 Missing data for the covariates included in the models was imputed with multiple 
-imputation using mice [@mice] for 10 datasets and 10 iterations. 
+imputation using mice [@mice] for 10 datasets and 20 iterations. 
 Variables included in the imputation model are indicated in Table \ref{tab:tab1}. 
 The primary outcome, all-cause death or first re-hospitalization for HF at follow-up, was included as the Nelson-Aalen estimator. Valve disease was not included in the model or imputed. 
 
@@ -118,9 +117,8 @@ The primary outcome, all-cause death or first re-hospitalization for HF at follo
 
 ## Associations between valve disease and characteristics
 
-Performed using logistic regression (one for combined VHD vs No VHD and one for Single VDH vs No VHD). 
-
-TO DO: Forestplots? One presenting crud, one adjusted. All variables or selected?
+Performed using logistic regression (one for combined MR vs No VHD, 
+one for TR vs No VHD, one for MR+TR vs No VHD). 
 
 ```{r, child = "./src/ortab.Rmd"}
 
@@ -131,8 +129,6 @@ TO DO: Forestplots? One presenting crud, one adjusted. All variables or selected
 Further, crude logistic regressions are performed for MR and TR vs No VHD respectively 
 but where the other valve is included (so patients with MR can have TR and vice versa) 
 for important valve variables. No adjustment is performed. Imputation is not performed. 
-
-TO DO: Forestplots? 
 
 ```{r, child = "./src/ortab_valvevars.Rmd"}
 

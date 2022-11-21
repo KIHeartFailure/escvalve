@@ -1,4 +1,4 @@
-```{r kmexaorta, cache=cacheon}
+```{r km, cache=cacheon}
 
 kmfunc <- function(time, event, eventname, ymax = 1) {
   fits <- survfit(formula(paste0("Surv(", time, ",", event, "== 1) ~ valve")),
@@ -29,7 +29,7 @@ kmfunc <- function(time, event, eventname, ymax = 1) {
     ylab = paste0(eventname, " (%)"),
     yscale = 100,
     xscale = 30.5,
-    col = global_cols[c(1, 3, 5, 7)],
+    col = global_cols[c(8, 6, 4, 2)],
     mark.time = FALSE,
     bty = "n",
     xlim = c(0, 12 * 30),
@@ -52,15 +52,15 @@ kmfunc <- function(time, event, eventname, ymax = 1) {
          cex = cexmy, adj = 0.5, bty = "n")
   legend(
     x = 0.5, y = ymax + 0.05, bty = "n", c("", levs), lty = 1,
-    col = c("white", global_cols[c(1, 3, 5, 7)]), cex = cexmy, lwd = 4,
-    text.col = c("white", global_cols[c(1, 3, 5, 7)])
+    col = c("white", global_cols[c(8, 6, 4, 2)]), cex = cexmy, lwd = 4,
+    text.col = c("white", global_cols[c(8, 6, 4, 2)])
   )
 
   mtext("No. at risk", side = 1, line = 3.7, at = -104, adj = 0, cex = cexmy, font = 2)
-  mtext(levs[1], side = 1, line = 4.7, at = -104, adj = 0, cex = cexmy, col = global_cols[1])
-  mtext(levs[2], side = 1, line = 5.7, at = -104, adj = 0, cex = cexmy, col = global_cols[3])
-  mtext(levs[3], side = 1, line = 6.7, at = -104, adj = 0, cex = cexmy, col = global_cols[5])
-  mtext(levs[4], side = 1, line = 7.7, at = -104, adj = 0, cex = cexmy, col = global_cols[7])
+  mtext(levs[1], side = 1, line = 4.7, at = -104, adj = 0, cex = cexmy, col = global_cols[8])
+  mtext(levs[2], side = 1, line = 5.7, at = -104, adj = 0, cex = cexmy, col = global_cols[6])
+  mtext(levs[3], side = 1, line = 6.7, at = -104, adj = 0, cex = cexmy, col = global_cols[4])
+  mtext(levs[4], side = 1, line = 7.7, at = -104, adj = 0, cex = cexmy, col = global_cols[2])
 
   nrisk <- summary(fits, seq(0, 12, 2) * 30, extend = T)
 
@@ -79,7 +79,7 @@ kmfunc <- function(time, event, eventname, ymax = 1) {
 }
 ```
 
-```{r kmdeathcvhfhexaorta, fig.cap="CV mortality/First HF hospitalization - excluding Aorta", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
+```{r kmdeathcvhfhexaorta, fig.cap="CV mortality/First HF hospitalization", cache=cacheon, dependson="km", fig.width=8, fig.height=7}
 kmfunc(
   time = "outtime_hosphf",
   event = "out_deathcvhosphf",
@@ -88,7 +88,7 @@ kmfunc(
 )
 ```
 
-```{r kmdeathhfhexaorta, fig.cap="All-cause mortality/First HF hospitalization - excluding Aorta", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
+```{r kmdeathhfhexaorta, fig.cap="All-cause mortality/First HF hospitalization", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
 kmfunc(
   time = "outtime_hosphf",
   event = "out_deathhosphf",
@@ -97,7 +97,7 @@ kmfunc(
 )
 ```
 
-```{r kmdeathcvexaorta, fig.cap="CV mortality - excluding Aorta", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
+```{r kmdeathcvexaorta, fig.cap="CV mortality", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
 kmfunc(
   time = "outtime_death",
   event = "out_deathcv",
@@ -106,7 +106,7 @@ kmfunc(
 )
 ```
 
-```{r kmdeathexaorta, fig.cap="All-cause mortality - excluding Aorta", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
+```{r kmdeathexaorta, fig.cap="All-cause mortality", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
 kmfunc(
   time = "outtime_death",
   event = "out_death",
@@ -115,7 +115,7 @@ kmfunc(
 )
 ```
 
-```{r kmhfhexaorta, fig.cap="First HF hospitalization - excluding Aorta", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
+```{r kmhfhexaorta, fig.cap="First HF hospitalization", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
 kmfunc(
   time = "outtime_hosphf",
   event = "out_hosphf",
@@ -124,7 +124,7 @@ kmfunc(
 )
 ```
 
-```{r kmhexaorta, fig.cap="First all-cause hospitalization - excluding Aorta", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
+```{r kmhexaorta, fig.cap="First all-cause hospitalization", cache=cacheon, dependson="kmexaorta", fig.width=8, fig.height=7}
 kmfunc(
   time = "outtime_hosp",
   event = "out_hosp",

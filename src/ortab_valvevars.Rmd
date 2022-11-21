@@ -25,7 +25,8 @@ predvalvefunc <- function(yvar, valvevars) {
   }
 
   outprint <- out %>% select(Variable, orci, p)
-  return(outprint)
+  outall <- list(out = out, outprint = outprint)
+  return(outall)
 }
 ```
 
@@ -34,7 +35,7 @@ predvalvefunc <- function(yvar, valvevars) {
 mr <- predvalvefunc(yvar = "num_opMitReg", valvevars = c("num_dmValve", "num_dmEtio_cat2", "num_opMr", "num_opTriCus"))
 tr <- predvalvefunc(yvar = "num_opTriCus", valvevars = c("num_dmValve", "num_dmEtio_cat2", "num_opMr", "num_opMitReg"))
 
-outall <- full_join(mr, tr, by = "Variable")
+outall <- full_join(mr$outprint, tr$outprint, by = "Variable")
 
 colnames(outall) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 2))
 
@@ -49,4 +50,91 @@ default_kable(outall,
   escape = T
 ) %>%
   add_header_above(c(" " = 1, "MR vs No VHD" = 2, "TR vs No VHD" = 2))
+```
+
+```{r ortvalveforest, cache=cacheon, dependson=c("ortabvalvefunc", "ortabvalve"), fig.width=9, fig.height=6}
+
+forestdata <- bind_rows(
+  mr$out %>% mutate(vhd = "MR"),
+  tr$out %>% mutate(vhd = "TR")
+) %>%
+  mutate(Variable = case_when(
+    Variable == "num_dmValveYes" ~ "Valvular surgery",
+    Variable == "num_dmEtio_cat2Valve disease" ~ "Primary etiology Valve vs Other",
+    Variable == "num_opMitRegYes" ~ "1.MT (moderate-severe)",
+    Variable == "num_opTriCusYes" ~ "1.TR (moderate-severe)",
+    Variable == "num_opMrYes" ~ "MT (physical signs)"
+  )) %>%
+  arrange(vhd, Variable) %>%
+  mutate(
+    order = n():1,
+    Variable = str_remove_all(Variable, "1."),
+    vhd = if_else(Variable %in% c("TR (moderate-severe)", "MT (moderate-severe)"), vhd, "")
+  )
+
+cextext <- 1.3
+
+minmy <- floor(exp(min(forestdata$lci, na.rm = T)) * 100) / 100
+maxmy <- ceiling(exp(max(forestdata$uci, na.rm = T)))
+
+# c(bottom, left, top, right)
+par(mar = c(3, 25.5, 0, 0) + 0.2)
+
+gplots::plotCI(
+  x = forestdata$logor, y = forestdata$order,
+  li = forestdata$lci,
+  ui = forestdata$uci,
+  err = "x",
+  cex = 1.7,
+  xlim = c(
+    log(minmy),
+    log(maxmy)
+  ),
+  xlab = "",
+  ylim = c(1, nrow(forestdata) + 1),
+  axes = FALSE,
+  ylab = "",
+  main = NA,
+  pch = 22,
+  pt.bg = global_cols[c(4, 6)],
+  col = global_cols[c(4, 6)],
+  lwd = 2,
+  gap = 0
+)
+
+abline(v = log(1), lty = 2)
+
+axis(1,
+  cex.axis = cextext, at = log(c(minmy, 1, maxmy)),
+  labels = c(minmy, 1, maxmy)
+)
+
+axis(2,
+  at = forestdata$order,
+  labels = forestdata$vhd,
+  cex.axis = cextext, tick = FALSE, las = 2, line = 24.5, hadj = 0
+)
+
+axis(2,
+  at = forestdata$order,
+  labels = forestdata$Variable,
+  cex.axis = cextext, tick = FALSE, las = 2, line = 22.5, hadj = 0
+)
+
+axis(2,
+  at = nrow(forestdata) + 1,
+  labels = "Crude OR (95% CI)",
+  cex.axis = cextext, tick = FALSE, las = 2, line = 3, hadj = 0.5, font = 2
+)
+
+axis(2,
+  at = forestdata$order,
+  labels = forestdata$orci,
+  cex.axis = cextext, tick = FALSE, las = 2, line = 3, hadj = 0.5
+)
+
+axis(1,
+  at = (log(maxmy) + log(minmy)) / 2, cex.axis = cextext,
+  labels = "Crude OR (95% CI)", line = 1, tick = FALSE
+)
 ```
