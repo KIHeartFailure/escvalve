@@ -54,5 +54,3 @@ imp <-
     )
   }
 stopImplicitCluster()
-
-impsurv <- miceadds::subset_datlist(imp, expr_subset = edata$survpop == T)

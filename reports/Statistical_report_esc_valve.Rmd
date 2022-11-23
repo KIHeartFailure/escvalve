@@ -118,7 +118,7 @@ The primary outcome, all-cause death or first re-hospitalization for HF at follo
 ## Associations between valve disease and characteristics
 
 Performed using logistic regression (one for combined MR vs No VHD, 
-one for TR vs No VHD, one for MR+TR vs No VHD). 
+one for TR vs No VHD, one for MR+TR vs No VHD). Variables included in the model are those presented in the table/Forest plot.
 
 ```{r, child = "./src/ortab.Rmd"}
 
@@ -126,7 +126,7 @@ one for TR vs No VHD, one for MR+TR vs No VHD).
 
 \clearpage
 
-Further, crude logistic regressions are performed for MR and TR vs No VHD respectively 
+Further, crude logistic regressions were performed for MR and TR vs No VHD respectively 
 but where the other valve is included (so patients with MR can have TR and vice versa) 
 for important valve variables. No adjustment is performed. Imputation is not performed. 
 
@@ -143,7 +143,10 @@ The long-term outcome analysis is performed on the long-term outcome population 
 Time is from date of visit and censored at death not defined as an event or end of follow-up.  
 
 The outcomes are presented with cumulative incidence curves and Cox proportional hazards regressions were 
-used to model the time to first event. Adjustment was performed for variables indicated in Table \ref{tab:tab1} and the selection was based on clinical judgement. 
+used to model the time to first event. Adjustment was performed for variables indicated in Table \ref{tab:tab1} and the selection was based on clinical judgement. The continuous variables are included using cubic splines with 4 degrees of freedom. The proportional hazards assumption was investigated using the scaled Schoenfeld 
+residuals (cox.zph in [@survival-package]) and NYHA class and HF duration exhibited non-proportional 
+hazards and where as a results included as strata variables in the cox regression model.
+
 
 The median (q1-q3) follow-up for the long-term outcomes is 
 `r edata %>% filter(survpop) %>% summarise(med = fn(median(outtime_death / 365.25 * 12), dig = 1),
@@ -164,11 +167,6 @@ The median (q1-q3) follow-up for the long-term outcomes is
 ```{r, child = "./src/outtab.Rmd"}
 
 ```
-
-### Assumptions
-
-The proportional hazards assumption was investigated using the scaled Schoenfeld 
-residuals (cox.zph in [@survival-package]) and ==> XXX.
 
 \clearpage
 

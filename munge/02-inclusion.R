@@ -2,7 +2,7 @@
 
 # Primary criteria --------------------------------------------------------
 
-flow <- c(paste0("Patients in ESC registry"), nrow(esc))
+flow <- c(paste0("Patients in ESC-HF-LT registry"), nrow(esc))
 
 edata <- esc %>%
   filter(num_dmPtype == "Outpatient")

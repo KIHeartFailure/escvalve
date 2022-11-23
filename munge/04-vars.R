@@ -38,35 +38,41 @@ tabvars <- c(
   "num_dmEtio_cat",
   "num_dmEtio_c1",
   "num_dmBpm",
+  "num_dmBpm_cat",
   "num_dmBp1",
+  "num_dmBp1_cat",
   "num_dmBmi",
+  "num_dmBmi_cat",
   "num_dmWeight",
   "num_opCre",
   "d_opCKDEPI",
   "d_opCKDEPI_cat",
   "num_opBun",
   "num_opSod",
+  "num_opSod_cat",
   "num_opGl",
   "num_opHb",
-  "d_anemia",
+  "num_opHb_cat",
   "num_opBnp",
   "num_opNt",
+  "num_opNt_cat",
   "num_opTrop",
   "num_opRyth",
   "num_opQrsD",
   "num_opQt",
   "num_opLbbb",
   "num_opLvdd",
-  "num_opRal", 
-  "num_opS3", 
-  "num_opJvp", 
-  "num_opHypop", 
-  "num_opEff", 
-  "num_opCold", 
-  "num_opHep", 
-  "num_opMr", 
-  "num_opOed", 
-  "num_opAs", 
+  "num_opLvdd_cat",
+  "num_opRal",
+  "num_opS3",
+  "num_opJvp",
+  "num_opHypop",
+  "num_opEff",
+  "num_opCold",
+  "num_opHep",
+  "num_opMr",
+  "num_opOed",
+  "num_opAs",
   #  "num_opLadim",
   "d_rasiarni_prior",
   "d_rasiarni_visit",
@@ -84,7 +90,6 @@ tabvars <- c(
   "num_mdACh"
 )
 
-
 modvars <- c(
   "num_dmgender",
   "num_age",
@@ -100,7 +105,7 @@ modvars <- c(
   "num_dmPvd",
   "num_dmCopd",
   "num_dmStroke",
-  "d_opCKDEPI_cat",
+  "d_opCKDEPI",
   "num_dmBpm",
   "num_dmBp1",
   "num_opSod",
@@ -108,3 +113,13 @@ modvars <- c(
   "num_opNt",
   "num_opLvdd"
 )
+
+kontvars <- names(edata %>% select(!!!syms(modvars)) %>% select(where(is.numeric)))
+stratavars <- c("num_opNyha_cat", "d_HFdiagnosis")
+
+modvarscox <- modvars
+modvarscox[modvars %in% kontvars] <- paste0("ns(", kontvars, ", df = 4)")
+modvarscox[modvars %in% stratavars] <- paste0("strata(", stratavars, ")")
+
+modvarslog <- modvars
+modvarslog[modvars %in% c(kontvars)] <- paste0(kontvars, "_cat")

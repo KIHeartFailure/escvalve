@@ -3,20 +3,12 @@
 predfunc <- function(impdata, val) {
   # mult
 
-  ormod <- with(impdata, glm(formula(paste0("valve == '", val, "' ~ ", paste(modvars, collapse = " + "))),
+  ormod <- with(impdata, glm(formula(paste0("valve == '", val, "' ~ ", paste(modvarslog, collapse = " + "))),
     family = binomial(link = "logit")
   ))
 
   sormod <- summary(pool(ormod))
   nval <- length(sormod$term)
-
-  units <- rep(1, nval - 1)
-  units[sormod$term[2:nval] %in% c(
-    "num_age", "d_opCKDEPI_cat", "num_dmBpm",
-    "num_dmBp1", "num_opSod", "num_opLvdd"
-  )] <- 10
-  units[sormod$term[2:nval] %in% c("num_opNt")] <- 100
-  units[sormod$term[2:nval] %in% c("num_opEf", "num_dmBmi")] <- 5
 
   preds <- bind_cols(
     Variable = as.character(sormod$term[2:nval]),
@@ -26,15 +18,13 @@ predfunc <- function(impdata, val) {
     p = fn(sormod$p.value[2:nval], dig = 3, p = TRUE)
   ) %>%
     mutate(orci = paste0(
-      fn(exp(logor)^units, 2),
-      " (", fn(exp(lci)^units, 2), "-",
-      fn(exp(uci)^units, 2), ")"
+      fn(exp(logor), 2),
+      " (", fn(exp(lci), 2), "-",
+      fn(exp(uci), 2), ")"
     )) %>%
     select(Variable, logor, lci, uci, orci, p) %>%
     mutate(
-      Variable = str_replace(Variable, fixed("Yes"), ""),
-      Variable = paste0(Variable, " (units of ", units, ")"),
-      Variable = str_replace(Variable, fixed(" (units of 1)"), "")
+      Variable = str_replace(Variable, fixed("Yes"), "")
     )
 
   # mult excluding nyha
@@ -42,21 +32,13 @@ predfunc <- function(impdata, val) {
   ormod <- with(impdata, glm(
     formula(paste0(
       "valve == '", val, "' ~ ",
-      paste(modvars[modvars != "num_opNyha_cat"], collapse = " + ")
+      paste(modvarslog[modvarslog != "num_opNyha_cat"], collapse = " + ")
     )),
     family = binomial(link = "logit")
   ))
 
   sormod <- summary(pool(ormod))
   nval <- length(sormod$term)
-
-  units <- rep(1, nval - 1)
-  units[sormod$term[2:nval] %in% c(
-    "num_age", "d_opCKDEPI_cat", "num_dmBpm",
-    "num_dmBp1", "num_opSod", "num_opLvdd"
-  )] <- 10
-  units[sormod$term[2:nval] %in% c("num_opNt")] <- 100
-  units[sormod$term[2:nval] %in% c("num_opEf", "num_dmBmi")] <- 5
 
   predsexnyha <- bind_cols(
     Variable = as.character(sormod$term[2:nval]),
@@ -66,34 +48,24 @@ predfunc <- function(impdata, val) {
     p = fn(sormod$p.value[2:nval], dig = 3, p = TRUE)
   ) %>%
     mutate(orci = paste0(
-      fn(exp(logor)^units, 2),
-      " (", fn(exp(lci)^units, 2), "-",
-      fn(exp(uci)^units, 2), ")"
+      fn(exp(logor), 2),
+      " (", fn(exp(lci), 2), "-",
+      fn(exp(uci), 2), ")"
     )) %>%
     select(Variable, logor, lci, uci, orci, p) %>%
     mutate(
-      Variable = str_replace(Variable, fixed("Yes"), ""),
-      Variable = paste0(Variable, " (units of ", units, ")"),
-      Variable = str_replace(Variable, fixed(" (units of 1)"), "")
+      Variable = str_replace(Variable, fixed("Yes"), "")
     )
 
   # crude
-  for (i in seq_along(modvars)) {
-    ormoduni <- with(impdata, glm(formula(paste0("valve == '", val, "' ~ ", modvars[i])),
+  for (i in seq_along(modvarslog)) {
+    ormoduni <- with(impdata, glm(formula(paste0("valve == '", val, "' ~ ", modvarslog[i])),
       family = binomial(link = "logit")
     ))
 
     sormoduni <- summary(pool(ormoduni))
 
     nval <- length(sormoduni$term)
-
-    units <- rep(1, nval - 1)
-    units[sormoduni$term[2:nval] %in% c(
-      "num_age", "d_opCKDEPI_cat", "num_dmBpm",
-      "num_dmBp1", "num_opSod", "num_opLvdd"
-    )] <- 10
-    units[sormoduni$term[2:nval] %in% c("num_opNt")] <- 100
-    units[sormoduni$term[2:nval] %in% c("num_opEf", "num_dmBmi")] <- 5
 
     predsunitmp <- bind_cols(
       Variable = as.character(sormoduni$term[2:nval]),
@@ -103,15 +75,13 @@ predfunc <- function(impdata, val) {
       p = fn(sormoduni$p.value[2:nval], dig = 3, p = TRUE)
     ) %>%
       mutate(orci = paste0(
-        fn(exp(logor)^units, 2),
-        " (", fn(exp(lci)^units, 2), "-",
-        fn(exp(uci)^units, 2), ")"
+        fn(exp(logor), 2),
+        " (", fn(exp(lci), 2), "-",
+        fn(exp(uci), 2), ")"
       )) %>%
       select(Variable, logor, lci, uci, orci, p) %>%
       mutate(
-        Variable = str_replace(Variable, fixed("Yes"), ""),
-        Variable = paste0(Variable, " (units of ", units, ")"),
-        Variable = str_replace(Variable, fixed(" (units of 1)"), "")
+        Variable = str_replace(Variable, fixed("Yes"), "")
       )
 
     if (i == 1) {
@@ -133,10 +103,10 @@ predfunc <- function(impdata, val) {
   predall <- predall %>%
     mutate(Variable = case_when(
       Variable == "num_dmgenderFemale" ~ "Female vs Male",
-      Variable == "num_age (units of 10)" ~ "Age per 10 (years)",
-      Variable == "num_dmBmi (units of 5)" ~ "BMI per 5 (kg/m²)",
-      Variable == "d_Efcomb_cat41-49" ~ "LVEF 41-49 vs <=40 (%)",
-      Variable == "d_Efcomb_cat>=50" ~ "LVEF >=50 vs <=40 (%)",
+      Variable == "num_age_cat>=65" ~ "Age >=65 vs <65 (years)",
+      Variable == "num_dmBmi_cat>=25" ~ "BMI >=25 vs <25 (kg/m²)",
+      Variable == "d_Efcomb_cat41-49" ~ "EF 41-49 vs <=40 (%)",
+      Variable == "d_Efcomb_cat>=50" ~ "EF >=50 vs <=40 (%)",
       Variable == "num_opNyha_catIII-IV" ~ "NYHA III-IV vs I-II",
       Variable == "d_HFdiagnosis>12mo" ~ "HF duration > 12 mo",
       Variable == "d_dmHF_catPrevious HF hosp" ~ "Previous HFH",
@@ -147,13 +117,14 @@ predfunc <- function(impdata, val) {
       Variable == "num_dmPvd" ~ "Peripheral vascular disease",
       Variable == "num_dmCopd" ~ "COPD",
       Variable == "num_dmStroke" ~ "Prior stroke/TIA",
-      Variable == "d_opCKDEPI_cat>=60" ~ "eGFR <60 vs >=60 (mL/min/1.73 m²)",
-      Variable == "num_dmBpm (units of 10)" ~ "SBP per 10 (mmHg)",
-      Variable == "num_dmBp1 (units of 10)" ~ "HR per 10 (bpm)",
-      Variable == "num_opSod (units of 10)" ~ "Sodium per 10 (mmol/l)",
-      Variable == "num_opHb" ~ "Hemoglobin (g/dL)",
-      Variable == "num_opNt (units of 100)" ~ "NTproBNP per 100 (pg/mL)",
-      Variable == "num_opLvdd (units of 10)" ~ "LVEDD per 10 (mm)"
+      Variable == "d_opCKDEPI_cat<60" ~ "eGFR <60 vs >=60 (mL/min/1.73 m²)",
+      Variable == "num_dmBpm_cat>=70" ~ "HR >=70 vs <70 (bpm)",
+      Variable == "num_dmBp1_cat>=100" ~ "SBP >=100 vs <100 (mmHg)",
+      Variable == "num_opSod_cat<135" ~ "Sodium <135 vs >=135 (mmol/l)",
+      Variable == "num_opHb_cat<13/12 (w/m)" ~ "Anemia",
+      Variable == "num_opNt_cat>=median" ~ "NTproBNP >=median vs <median (pg/mL)",
+      Variable == "num_opLvdd_cat>=60" ~ "LVEDD >=60 vs <60 (mm)",
+      TRUE ~ Variable
     ))
 
   predallprint <- predall %>%
@@ -185,7 +156,7 @@ plotforest <- function(forestdata, modtype) {
   g3 <- forestdata %>% filter(vhd == "MR+TR")
 
   # c(bottom, left, top, right)
-  par(mar = c(4, 30, 0, 0) + 0.2)
+  par(mar = c(4, 31, 0, 0) + 0.2)
 
   add1 <- 3.2
   add2 <- 6.4
@@ -195,7 +166,7 @@ plotforest <- function(forestdata, modtype) {
     li = g1$lci,
     ui = g1$uci,
     err = "x",
-    cex = 0.8,
+    cex = 0.7,
     xlim = c(
       log(minmy),
       log(maxmy) + add2
@@ -208,8 +179,9 @@ plotforest <- function(forestdata, modtype) {
     pch = 22,
     pt.bg = global_cols[6],
     col = global_cols[6],
-    lwd = 1,
-    gap = 0
+    lwd = .9,
+    gap = 0, 
+    sfrac = 0.007
   )
 
   gplots::plotCI(
@@ -217,7 +189,7 @@ plotforest <- function(forestdata, modtype) {
     li = g2$lci + add1,
     ui = g2$uci + add1,
     err = "x",
-    cex = 0.9,
+    cex = 0.7,
     xlab = "",
     axes = FALSE,
     ylab = "",
@@ -226,8 +198,9 @@ plotforest <- function(forestdata, modtype) {
     pt.bg = global_cols[4],
     col = global_cols[4],
     add = T,
-    lwd = 1,
-    gap = 0
+    lwd = 0.9,
+    gap = 0, 
+    sfrac = 0.007
   )
 
   gplots::plotCI(
@@ -235,7 +208,7 @@ plotforest <- function(forestdata, modtype) {
     li = g3$lci + add2,
     ui = g3$uci + add2,
     err = "x",
-    cex = 1,
+    cex = 0.7,
     xlab = "",
     axes = FALSE,
     ylab = "",
@@ -244,8 +217,9 @@ plotforest <- function(forestdata, modtype) {
     pt.bg = global_cols[2],
     col = global_cols[2],
     add = T,
-    lwd = 1,
-    gap = 0
+    lwd = 0.9,
+    gap = 0, 
+    sfrac = 0.007
   )
 
   abline(v = log(1), lty = 2)
@@ -268,50 +242,50 @@ plotforest <- function(forestdata, modtype) {
   axis(2,
     at = g1$order,
     labels = g1$Variable,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 29, hadj = 0
+    cex.axis = cextext, tick = FALSE, las = 2, line = 30, hadj = 0
   )
 
   axis(2,
     at = nrow(g1) + 1,
     labels = "MR",
-    cex.axis = cextext, tick = FALSE, las = 2, line = 14, hadj = 0.5, font = 2,
+    cex.axis = cextext, tick = FALSE, las = 2, line = 13.5, hadj = 0.5, font = 2,
     col.axis = global_cols[6]
   )
   axis(2,
     at = g1$order,
     labels = g1$orci,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 14, hadj = 0.5,
+    cex.axis = cextext, tick = FALSE, las = 2, line = 13.5, hadj = 0.5,
     col.axis = global_cols[6]
   )
 
   axis(2,
     at = nrow(g1) + 2,
     labels = paste0(modtype, " OR (95% CI)"),
-    cex.axis = cextext, tick = FALSE, las = 2, line = 8, hadj = 0.5, font = 2
+    cex.axis = cextext, tick = FALSE, las = 2, line = 7.5, hadj = 0.5, font = 2
   )
   axis(2,
     at = nrow(g1) + 1,
     labels = "TR",
-    cex.axis = cextext, tick = FALSE, las = 2, line = 8, hadj = 0.5, font = 2,
+    cex.axis = cextext, tick = FALSE, las = 2, line = 7.5, hadj = 0.5, font = 2,
     col.axis = global_cols[4]
   )
   axis(2,
     at = g2$order,
     labels = g2$orci,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 8, hadj = 0.5,
+    cex.axis = cextext, tick = FALSE, las = 2, line = 7.5, hadj = 0.5,
     col.axis = global_cols[4]
   )
 
   axis(2,
     at = nrow(g1) + 1,
     labels = "MR+TR",
-    cex.axis = cextext, tick = FALSE, las = 2, line = 2, hadj = 0.5, font = 2,
+    cex.axis = cextext, tick = FALSE, las = 2, line = 1.5, hadj = 0.5, font = 2,
     col.axis = global_cols[2]
   )
   axis(2,
     at = g3$order,
     labels = g3$orci,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 2, hadj = 0.5,
+    cex.axis = cextext, tick = FALSE, las = 2, line = 1.5, hadj = 0.5,
     col.axis = global_cols[2]
   )
 
@@ -348,7 +322,7 @@ predalltr <- predfunc(impdata = impdatatr, val = "TR")
 predallcomb <- predfunc(impdata = impdatacomb, val = "MR+TR")
 
 predall <- bind_cols(predallmr$predallprint, predalltr$predallprint[2:7], predallcomb$predallprint[2:7])
-colnames(predall) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 8))
+colnames(predall) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 9))
 
 write.xlsx(predall, paste0(
   "./output/tabs/Associations between valve disease and characteristics_", Sys.Date(), ".xlsx"

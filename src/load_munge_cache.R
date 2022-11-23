@@ -14,6 +14,8 @@ ProjectTemplate::cache("esclab")
 
 ProjectTemplate::cache("tabvars")
 ProjectTemplate::cache("modvars")
+ProjectTemplate::cache("modvarscox")
+ProjectTemplate::cache("modvarslog")
 
 ProjectTemplate::cache("flow")
 ProjectTemplate::cache("edata")

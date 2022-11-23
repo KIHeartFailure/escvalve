@@ -96,8 +96,8 @@ gplots::plotCI(
   ylab = "",
   main = NA,
   pch = 22,
-  pt.bg = global_cols[c(4, 6)],
-  col = global_cols[c(4, 6)],
+  pt.bg = rep(global_cols[c(6, 4)], each = 4),
+  col = rep(global_cols[c(6, 4)], each = 4),
   lwd = 2,
   gap = 0
 )

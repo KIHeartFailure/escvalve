@@ -8,7 +8,7 @@ kmfunc <- function(time, event, eventname, ymax = 1) {
   # cox model
   amod <- with(impsurv, coxph(formula(paste0(
     "Surv(", time, ",", event, " == 1) ~ relevel(valve, ref = 'No VHD') + ",
-    paste(modvars, collapse = " + ")
+    paste(modvarscox, collapse = " + ")
   ))))
 
   asmod <- summary(pool(amod))
@@ -48,8 +48,10 @@ kmfunc <- function(time, event, eventname, ymax = 1) {
 
   levs <- levels(edata %>% pull(valve))
 
-  legend(x = 6.1 * 30, y = ymax + 0.05, c("Adjusted HR (95% CI), p-value", "ref", hrprint), 
-         cex = cexmy, adj = 0.5, bty = "n")
+  legend(
+    x = 6.1 * 30, y = ymax + 0.05, c("Adjusted HR (95% CI), p-value", "ref", hrprint),
+    cex = cexmy, adj = 0.5, bty = "n"
+  )
   legend(
     x = 0.5, y = ymax + 0.05, bty = "n", c("", levs), lty = 1,
     col = c("white", global_cols[c(8, 6, 4, 2)]), cex = cexmy, lwd = 4,
@@ -64,18 +66,26 @@ kmfunc <- function(time, event, eventname, ymax = 1) {
 
   nrisk <- summary(fits, seq(0, 12, 2) * 30, extend = T)
 
-  axis(1, at = seq(0, 12, 2) * 30, labels = 
-         nrisk$n.risk[nrisk$strata == paste0("valve=", levs[1])], 
-       line = 3.7, tick = FALSE, cex.axis = cexmy)
-  axis(1, at = seq(0, 12, 2) * 30, labels = 
-         nrisk$n.risk[nrisk$strata == paste0("valve=", levs[2])], 
-       line = 4.7, tick = FALSE, cex.axis = cexmy)
-  axis(1, at = seq(0, 12, 2) * 30, labels = 
-         nrisk$n.risk[nrisk$strata == paste0("valve=", levs[3])], 
-       line = 5.7, tick = FALSE, cex.axis = cexmy)
-   axis(1, at = seq(0, 12, 2) * 30, labels = 
-          nrisk$n.risk[nrisk$strata == paste0("valve=", levs[4])], 
-        line = 6.7, tick = FALSE, cex.axis = cexmy)
+  axis(1,
+    at = seq(0, 12, 2) * 30, labels =
+      nrisk$n.risk[nrisk$strata == paste0("valve=", levs[1])],
+    line = 3.7, tick = FALSE, cex.axis = cexmy
+  )
+  axis(1,
+    at = seq(0, 12, 2) * 30, labels =
+      nrisk$n.risk[nrisk$strata == paste0("valve=", levs[2])],
+    line = 4.7, tick = FALSE, cex.axis = cexmy
+  )
+  axis(1,
+    at = seq(0, 12, 2) * 30, labels =
+      nrisk$n.risk[nrisk$strata == paste0("valve=", levs[3])],
+    line = 5.7, tick = FALSE, cex.axis = cexmy
+  )
+  axis(1,
+    at = seq(0, 12, 2) * 30, labels =
+      nrisk$n.risk[nrisk$strata == paste0("valve=", levs[4])],
+    line = 6.7, tick = FALSE, cex.axis = cexmy
+  )
 }
 ```
 

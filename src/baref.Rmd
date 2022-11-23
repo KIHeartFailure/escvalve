@@ -31,8 +31,14 @@ b <- barplot(per ~ valve + d_Efcomb_cat,
 
 axis(2, cex.axis = cexmy, las = 2)
 
+levs <- levels(outdata$d_Efcomb_cat)
+levs <- str_replace_all(levs, ">=", "\u2265")
+levs <- str_replace_all(levs, "<=", "\u2264")
+
+levs <- paste0("EF ", levs, "%")
+
 axis(1,
-  at = c(b[2, ] + 0.5), c("HFrEF", "HFmrEF", "HFpEF"),
+  at = c(b[2, ] + 0.5), levs,
   tick = F, line = 0,
   cex.axis = cexmy
 )
