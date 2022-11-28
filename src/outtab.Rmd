@@ -113,14 +113,14 @@ outall <- rbind(
   out1, out2, out3, out5, out6, out7
 )
 
-write.xlsx(outall, paste0("./output/tabs/Outcomes by Valve disease_", Sys.Date(), ".xlsx"),
+write.xlsx(outall, paste0("./output/tabs/Outcomes by valve disease_", Sys.Date(), ".xlsx"),
   rowNames = FALSE, overwrite = T
 )
 
 footnote(
   default_kable(outall,
     font_size = 6,
-    caption = "Outcomes by Valve disease"
+    caption = "Outcomes by valve disease"
   ),
   general = c(
     "Incidence =  no events, sum py, rate/100py (95% CI)."

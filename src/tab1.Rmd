@@ -1,6 +1,6 @@
 ```{r tab1func, cache=cacheon}
 
-tab1func <- function(stratavar, tabname, data = edata) {
+tab1func <- function(stratavar = "valve", tabname, data = edata) {
   taboverall <- print(
     CreateTableOne(
       vars = tabvars,
@@ -68,7 +68,8 @@ tab1func <- function(stratavar, tabname, data = edata) {
   # footnotes
   tab <- tab %>%
     mutate(
-      footnote1 = if_else(var_tmp %in% modvars, footnote_marker_number(1), "")
+      footnote1 = if_else(var_tmp %in% modvars, footnote_marker_number(1), ""),
+      footnote2 = if_else(var_tmp %in% modvarslog, footnote_marker_number(2), "")
     ) %>%
     unite(footnote, starts_with("footnote"), sep = "") %>%
     mutate(
@@ -97,7 +98,8 @@ tab1func <- function(stratavar, tabname, data = edata) {
       "Categorical variables are presented with n (%) and tested with chi-square test and continuous variables with median [q1-q3] and tested with Kruskal-Wallis test."
     ),
     number = c(
-      "Included in imputation, logistic and cox regression models. The continuous variables are included as categorical in the logistic regression models"
+      "Included in multiple imputation and cox regression models. The continuous variables are categorized for the logistic regression models.",
+      "Included in logistic regression models."
     )
   )
 }
@@ -105,8 +107,7 @@ tab1func <- function(stratavar, tabname, data = edata) {
 
 ```{r tab1, cache=cacheon, dependson = "tab1func"}
 tab1func(
-  stratavar = "valve",
-  tabname = "Baseline characteristics Valve disease - All"
+  tabname = "Baseline characteristics valve disease - All"
 )
 ```
 
@@ -114,8 +115,7 @@ tab1func(
 
 ```{r tab1surv, cache=cacheon, dependson = "tab1func"}
 tab1func(
-  stratavar = "valve",
-  tabname = "Baseline characteristics Valve disease - Long-term outcome population",
+  tabname = "Baseline characteristics valve disease - Long-term outcome population",
   data = edata %>% filter(survpop)
 )
 ```

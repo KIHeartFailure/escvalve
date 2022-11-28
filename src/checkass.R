@@ -56,6 +56,22 @@ termplot(ormod, terms = 19, ask = F, rug = T)
 termplot(ormod, terms = 20, ask = F, rug = T) 
 termplot(ormod, terms = 21, ask = F, rug = T) 
 
+ormodmr <- glm(formula(paste0("valve == 'MR' ~ ", paste0(modvars, collapse = " + "))),
+             family = binomial(link = "logit"), data = dataass %>% filter(valve %in% c("MR", "No VHD"))
+)
+ormodtr <- glm(formula(paste0("valve == 'TR' ~ ", paste0(modvars, collapse = " + "))),
+             family = binomial(link = "logit"), data = dataass %>% filter(valve %in% c("TR", "No VHD"))
+)
+ormodmtr <- glm(formula(paste0("valve == 'MR+TR' ~ ", paste0(modvars, collapse = " + "))),
+             family = binomial(link = "logit"), data = dataass %>% filter(valve %in% c("MR+TR", "No VHD"))
+)
+
+
+# multicollinearit
+
+car::vif(ormodmr)
+car::vif(ormodtr)
+car::vif(ormodmtr)
 
 # Outliers
 kontmodvars <- edata %>% 

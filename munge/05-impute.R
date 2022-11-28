@@ -54,3 +54,12 @@ imp <-
     )
   }
 stopImplicitCluster()
+
+
+# check i all impvars have been fully imputed
+
+datacheck <- mice::complete(imp, 1)
+
+for (i in seq_along(modvars)) {
+  if (any(is.na(datacheck[, modvars[i]]))) stop("Missing for imp vars")
+}

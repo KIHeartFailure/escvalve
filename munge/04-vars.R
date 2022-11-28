@@ -87,7 +87,8 @@ tabvars <- c(
   "num_mdDigop",
   "num_mdDigoh",
   "num_mdACp",
-  "num_mdACh"
+  "num_mdACh", 
+  "num_opRhcPap"
 )
 
 modvars <- c(

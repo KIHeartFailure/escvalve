@@ -29,7 +29,7 @@ long <- long %>%
     ), levels = 1:2, labels = c("<70", ">=70")),
     num_opSod_cat = factor(
       case_when(
-        is.na(num_opLvdd) ~ NA_real_,
+        is.na(num_opSod) ~ NA_real_,
         num_opSod < 135 ~ 2,
         num_opSod >= 135 ~ 1
       ),
@@ -72,7 +72,7 @@ long <- long %>%
       ),
       levels = 1:2,
       labels = c(">=60", "<60")
-    ),
+    )
   )
 
 # Convert back to mids object

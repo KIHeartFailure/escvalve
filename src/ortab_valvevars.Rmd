@@ -20,7 +20,7 @@ predvalvefunc <- function(yvar, valvevars) {
     out[i, 5] <- fn(sormod$coefficients[2, "Pr(>|z|)"], dig = 3, p = TRUE)
     out[i, 6] <- paste0(
       fn(exp(out[i, 2]), 2), " (",
-      fn(exp(out[i, 3]), 2), "-", fn(exp(out[i, 3]), 2), ")"
+      fn(exp(out[i, 3]), 2), "-", fn(exp(out[i, 4]), 2), ")"
     )
   }
 
@@ -74,7 +74,7 @@ forestdata <- bind_rows(
 
 cextext <- 1.3
 
-minmy <- floor(exp(min(forestdata$lci, na.rm = T)) * 100) / 100
+minmy <- round(exp(min(forestdata$lci, na.rm = T)), 2)
 maxmy <- ceiling(exp(max(forestdata$uci, na.rm = T)))
 
 # c(bottom, left, top, right)

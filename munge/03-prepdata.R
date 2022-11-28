@@ -242,4 +242,5 @@ edata <- edata %>%
     out_deathhosphf = ifelse(out_hosphf == 1, 1, out_death),
     # cv death or hf hosp
     out_deathcvhosphf = ifelse(out_hosphf == 1, 1, out_deathcv)
-  )
+  ) %>%
+  mutate(across(where(is.character), as.factor))

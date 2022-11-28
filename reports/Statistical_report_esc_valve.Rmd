@@ -1,6 +1,5 @@
 ---
 title: 'Statistical report: Characteristics and outcomes of patients with chronic heart failure with or without valvular heart disease – from the ESC HFA EORP Heart Failure Long-Term Registry'
-subtitle: 'DRAFT'
 author: 'Statistician: Lina Benson'
   
 date: "`r Sys.Date()`"
@@ -17,7 +16,6 @@ nocite: '@*'
 urlcolor: blue
 linkcolor: black
 header-includes:
-   - \usepackage{draftwatermark}
    - \usepackage{subfig}
    - \usepackage{pdflscape}
    - \newcommand{\blandscape}{\begin{landscape}}
@@ -99,7 +97,7 @@ to death or last follow-up were set to death or last follow-up.
 Missing data for the covariates included in the models was imputed with multiple 
 imputation using mice [@mice] for 10 datasets and 20 iterations. 
 Variables included in the imputation model are indicated in Table \ref{tab:tab1}. 
-The primary outcome, all-cause death or first re-hospitalization for HF at follow-up, was included as the Nelson-Aalen estimator. Valve disease was not included in the model or imputed. 
+The primary outcome, CV death or first re-hospitalization for HF at follow-up, was included as the Nelson-Aalen estimator. Valve disease was not included in the model or imputed. 
 
 \blandscape
 
@@ -117,8 +115,11 @@ The primary outcome, all-cause death or first re-hospitalization for HF at follo
 
 ## Associations between valve disease and characteristics
 
-Performed using logistic regression (one for combined MR vs No VHD, 
-one for TR vs No VHD, one for MR+TR vs No VHD). Variables included in the model are those presented in the table/Forest plot.
+Performed using univariable and multivariable logistic regression (one for combined MR vs No VHD, 
+one for TR vs No VHD, one for MR+TR vs No VHD). Variables included in the model 
+are those presented in the table/Forest plot. 
+The variables are selected based on clinical relevance and continuous variables 
+are categorized. 
 
 ```{r, child = "./src/ortab.Rmd"}
 
@@ -145,7 +146,7 @@ Time is from date of visit and censored at death not defined as an event or end 
 The outcomes are presented with cumulative incidence curves and Cox proportional hazards regressions were 
 used to model the time to first event. Adjustment was performed for variables indicated in Table \ref{tab:tab1} and the selection was based on clinical judgement. The continuous variables are included using cubic splines with 4 degrees of freedom. The proportional hazards assumption was investigated using the scaled Schoenfeld 
 residuals (cox.zph in [@survival-package]) and NYHA class and HF duration exhibited non-proportional 
-hazards and where as a results included as strata variables in the cox regression model.
+hazards and where as a results included as strata variables in the model.
 
 
 The median (q1-q3) follow-up for the long-term outcomes is 

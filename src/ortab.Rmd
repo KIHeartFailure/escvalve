@@ -148,7 +148,7 @@ plotforest <- function(forestdata, modtype) {
     mutate(order = n():1) %>%
     ungroup()
 
-  minmy <- floor(exp(min(forestdata$lci, na.rm = T)) * 100) / 100
+  minmy <- round(exp(min(forestdata$lci, na.rm = T)), 2)
   maxmy <- ceiling(exp(max(forestdata$uci, na.rm = T)))
 
   g1 <- forestdata %>% filter(vhd == "MR")
@@ -180,7 +180,7 @@ plotforest <- function(forestdata, modtype) {
     pt.bg = global_cols[6],
     col = global_cols[6],
     lwd = .9,
-    gap = 0, 
+    gap = 0,
     sfrac = 0.007
   )
 
@@ -199,7 +199,7 @@ plotforest <- function(forestdata, modtype) {
     col = global_cols[4],
     add = T,
     lwd = 0.9,
-    gap = 0, 
+    gap = 0,
     sfrac = 0.007
   )
 
@@ -218,7 +218,7 @@ plotforest <- function(forestdata, modtype) {
     col = global_cols[2],
     add = T,
     lwd = 0.9,
-    gap = 0, 
+    gap = 0,
     sfrac = 0.007
   )
 
