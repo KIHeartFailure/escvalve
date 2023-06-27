@@ -1,4 +1,4 @@
-# R code for the project Prevalence of, associations with, and outcomes in moderate-severe valve disease in chronic HF
+# R code for the project Prevalence, clinical characteristics and outcomes of heart failure patients with or without isolated or combined mitral and tricuspid regurgitation: insight from the ESC-HFA EORP Heart Failure Long-Term Registry
 
 The aim of this R code is to be transparent and document the data handling 
 and statistical analyses performed for the project.
@@ -31,4 +31,4 @@ reports/Statistical_report_XX.Rmd
 
 ## Publication
 
-... 
+http://doi.org/10.1002/ejhf.2929
